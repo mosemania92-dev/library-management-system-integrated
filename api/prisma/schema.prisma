@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATRON
+  LIBRARIAN
+}
+
+enum BorrowStatus {
+  ACTIVE
+  RETURNED
+}
+
+enum SpaceBookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  name           String
+  password       String?
+  role           Role            @default(PATRON)
+  createdAt      DateTime        @default(now())
+  reviews        Review[]
+  borrowRequests BorrowRequest[]
+  spaceBookings  SpaceBooking[]
+}
+
+model Genre {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[]
+}
+
+model Book {
+  id              Int             @id @default(autoincrement())
+  title           String
+  author          String
+  isbn            String?         @unique
+  description     String?
+  publishedYear   Int?
+  totalCopies     Int             @default(1)
+  copiesAvailable Int             @default(1)
+  createdAt       DateTime        @default(now())
+  genreId         Int
+  genre           Genre           @relation(fields: [genreId], references: [id], onDelete: Restrict)
+  reviews         Review[]
+  borrowRequests  BorrowRequest[]
+
+  @@unique([title, author])
+  @@index([genreId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  bookId    Int
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, userId])
+  @@index([userId])
+}
+
+model BorrowRequest {
+  id         Int          @id @default(autoincrement())
+  status     BorrowStatus @default(ACTIVE)
+  borrowedAt DateTime     @default(now())
+  dueDate    DateTime
+  returnedAt DateTime?
+  userId     Int
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId     Int
+  book       Book         @relation(fields: [bookId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status])
+  @@index([bookId, status])
+}
+
+model Space {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  description String?
+  capacity    Int            @default(1)
+  isActive    Boolean        @default(true)
+  bookings    SpaceBooking[]
+  createdAt   DateTime       @default(now())
+}
+
+model SpaceBooking {
+  id        Int                @id @default(autoincrement())
+  date      DateTime           @db.Date
+  startTime String
+  endTime   String
+  status    SpaceBookingStatus @default(CONFIRMED)
+  createdAt DateTime           @default(now())
+  userId    Int
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId   Int
+  space     Space              @relation(fields: [spaceId], references: [id], onDelete: Restrict)
+
+  @@index([spaceId, date, status])
+  @@index([userId])
+}

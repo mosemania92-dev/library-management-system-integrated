@@ -1,0 +1,254 @@
+{
+  "info": {
+    "name": "Library Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"librarian@example.com\",\n  \"name\": \"Lib Rarian\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "auth": {
+            "type": "noauth"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"librarian@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "auth": {
+            "type": "noauth"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('token', pm.response.json().access_token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Genres",
+      "item": [
+        {
+          "name": "Create Genre",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/genres",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Science Fiction\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Genres",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/genres"
+          },
+          "auth": {
+            "type": "noauth"
+          }
+        },
+        {
+          "name": "Get Genre By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/genres/1"
+          },
+          "auth": {
+            "type": "noauth"
+          }
+        },
+        {
+          "name": "Update Genre",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/genres/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fantasy\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Genre",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/genres/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Get All Books (filter, search, pagination)",
+          "auth": {
+            "type": "noauth"
+          },
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/books?genreId=1&search=dune&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "books"
+              ],
+              "query": [
+                {
+                  "key": "genreId",
+                  "value": "1"
+                },
+                {
+                  "key": "search",
+                  "value": "dune"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Book By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/books/1"
+          },
+          "auth": {
+            "type": "noauth"
+          }
+        },
+        {
+          "name": "Create Book (LIBRARIAN)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/books",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Dune\",\n  \"author\": \"Frank Herbert\",\n  \"isbn\": \"9780441013593\",\n  \"totalCopies\": 5,\n  \"genreId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Book (LIBRARIAN)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/books/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"totalCopies\": 8\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Book (LIBRARIAN)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/books/1"
+          }
+        }
+      ]
+    }
+  ]
+}
