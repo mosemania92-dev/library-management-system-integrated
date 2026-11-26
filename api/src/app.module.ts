@@ -5,7 +5,9 @@ import { GenresModule } from './genres/genres.module';
 import { BooksModule } from './books/books.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { BorrowModule } from './borrow/borrow.module';
+import { BorrowRequestsModule } from './borrow-requests/borrow-requests.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { AdminModule } from './admin/admin.module';
 import { SpacesModule } from './spaces/spaces.module';
 
 @Module({
@@ -16,7 +18,9 @@ import { SpacesModule } from './spaces/spaces.module';
     BooksModule,
     AuthModule,
     UsersModule,
-    BorrowModule,
+    BorrowRequestsModule,
+    BookingsModule,
+    AdminModule,
     SpacesModule,
   ],
 })

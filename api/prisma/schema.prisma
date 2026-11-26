@@ -13,11 +13,14 @@ enum Role {
 }
 
 enum BorrowStatus {
+  PENDING
+  APPROVED
+  REJECTED
   ACTIVE
   RETURNED
 }
 
-enum SpaceBookingStatus {
+enum BookingStatus {
   CONFIRMED
   CANCELLED
 }
@@ -31,7 +34,7 @@ model User {
   createdAt      DateTime        @default(now())
   reviews        Review[]
   borrowRequests BorrowRequest[]
-  spaceBookings  SpaceBooking[]
+  spaceBookings  Booking[]
 }
 
 model Genre {
@@ -79,6 +82,7 @@ model BorrowRequest {
   borrowedAt DateTime     @default(now())
   dueDate    DateTime
   returnedAt DateTime?
+  fineAmount Float @default(0)
   userId     Int
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookId     Int
@@ -94,16 +98,16 @@ model Space {
   description String?
   capacity    Int            @default(1)
   isActive    Boolean        @default(true)
-  bookings    SpaceBooking[]
+  bookings    Booking[]
   createdAt   DateTime       @default(now())
 }
 
-model SpaceBooking {
+model Booking {
   id        Int                @id @default(autoincrement())
   date      DateTime           @db.Date
   startTime String
   endTime   String
-  status    SpaceBookingStatus @default(CONFIRMED)
+  status    BookingStatus @default(CONFIRMED)
   createdAt DateTime           @default(now())
   userId    Int
   user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -82,3 +82,33 @@ The client `.env` points to `http://localhost:3000`. If the API is hosted elsewh
 - The backend ZIP did not contain a package manifest or Prisma service/module, so this package adds those standard NestJS project files to make the supplied source installable/buildable. Dependency versions are a compatible NestJS 10 / Prisma 5 baseline, not versions confirmed from the original archive.
 - The original source uses PostgreSQL. Ensure the database is running and `DATABASE_URL` is valid before starting the API.
 - Browser localStorage is used for the JWT as required by the assignment. For a production application, consider secure HttpOnly cookies and additional CSRF protections.
+
+
+## Borrow tracking, bookings, and librarian/admin routes
+
+The assignment implementation adds:
+
+- `BorrowStatus` values `PENDING`, `APPROVED`, `REJECTED`, `ACTIVE`, `RETURNED`.
+- `BookingStatus` and the `Booking` model (renamed from the integrated project's `SpaceBooking` model).
+- `BorrowRequest.fineAmount` persisted as a number.
+- `POST /borrow-requests` and `GET /borrow-requests/mine` for authenticated patrons.
+- `PATCH /borrow-requests/:id/status` for librarians. Changing a request to `RETURNED` records `returnedAt`, calculates `fineAmount`, and restores the book copy.
+- `POST /bookings` and `GET /bookings/mine` for authenticated patrons. Overlapping confirmed slots for the same space/date return HTTP 409.
+- Librarian-only `GET /admin/borrow-requests`, `PATCH /admin/borrow-requests/:id/status`, and `GET /admin/bookings`.
+- Pure `calculateFine(dueDate, returnDate, ratePerDay)` and Jest tests for on-time and late returns.
+
+Set `FINE_RATE_PER_DAY` in `api/.env` if the per-day fine should differ from the default of 10 (in your database currency units).
+
+### Apply the migration and run tests
+
+From `api/`:
+
+```bash
+npm install
+npx prisma generate
+npx prisma migrate dev --name borrow_booking_admin
+npm test -- --runInBand
+npm run build
+```
+
+The checked-in migration renames the original `SpaceBooking` table and enum to `Booking` / `BookingStatus` and adds the fine column. Review it against your actual development database before applying it. If this is a fresh database, use the project setup instructions above and let Prisma create the initial schema/migration.

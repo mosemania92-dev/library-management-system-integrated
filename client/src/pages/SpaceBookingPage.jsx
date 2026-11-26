@@ -36,7 +36,7 @@ export default function SpaceBookingPage() {
     if (form.startTime >= form.endTime) return setError("End time must be later than start time.");
     setBusy(true);
     try {
-      const response = await fetch(`${API_URL}/space-bookings`, {
+      const response = await fetch(`${API_URL}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -31,7 +31,7 @@ export class SpacesService {
         });
         if (!space) throw new NotFoundException('Space not found or inactive');
 
-        const overlap = await tx.spaceBooking.findFirst({
+        const overlap = await tx.booking.findFirst({
           where: {
             spaceId: dto.spaceId,
             date,
@@ -42,7 +42,7 @@ export class SpacesService {
         });
         if (overlap) throw new ConflictException('This space is already booked for that time');
 
-        return tx.spaceBooking.create({
+        return tx.booking.create({
           data: {
             userId,
             spaceId: dto.spaceId,
@@ -62,7 +62,7 @@ export class SpacesService {
   }
 
   mine(userId: number) {
-    return this.prisma.spaceBooking.findMany({
+    return this.prisma.booking.findMany({
       where: { userId },
       include: { space: true },
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
